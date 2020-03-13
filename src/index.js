@@ -21,10 +21,10 @@ function init() {
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 200);
   // camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 200);
-  camera.position.set(10, 8, 23);
+  camera.position.set(50, 40, 50);
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x000000, 10, 100);
+  scene.fog = new THREE.Fog(0x000000, 10, 180);
 
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
@@ -40,8 +40,8 @@ function init() {
   container.appendChild(renderer.domElement);
 
   controls = new OrbitControls(camera, renderer.domElement);
-  // controls.enabled = false;
-  // controls.autoRotate = true;
+  controls.enabled = false;
+  controls.autoRotate = true;
   controls.update();
 
   addLights();
@@ -66,34 +66,34 @@ function addItems() {
         const geometry = new THREE.BoxBufferGeometry(size, size, size);
         const material = new THREE.MeshLambertMaterial({ color: color });
         const person = new THREE.Mesh(geometry, material);
-        person.position.set((x + size / 2) * margin, (y + size / 2) * margin, (z + size / 2) * margin);
+        const randomX = Math.random() * size - size / 2;
+        const randomY = Math.random() * size - size / 2;
+        const randomZ = Math.random() * size - size / 2;
+        person.position.set((x + size / 2) * margin + randomX, (y + size / 2) * margin + randomY, (z + size / 2) * margin + randomZ);
 
         person.castShadow = true;
         person.receiveShadow = true;
 
         const colorChange = new THREE.Color(`hsla(0, 80%, 50%, 1)`);
         const colorTweenIn = new TWEEN.Tween(person.material.color)
-          .to(colorChange, 250)
-          .easing(TWEEN.Easing.Quartic.In)
+          .to(colorChange, 1000)
+          .easing(TWEEN.Easing.Cubic.In)
           .onStart(() => {
             person.tweenDone = true;
           })
           .onComplete(() => {
             if (person.closeProx.length > 0) {
-              const randomIndex = Math.floor(Math.random() * person.closeProx.length);
-              person.closeProx[randomIndex].colorTween.start();
-              person.closeProx.splice(randomIndex, 1);
-            }
-            // if (!person.closeProx[randomIndex].tweenDone) {
+              // const randomIndex = Math.floor(Math.random() * person.closeProx.length);
               // person.closeProx[randomIndex].colorTween.start();
               // person.closeProx.splice(randomIndex, 1);
-            // }
-            // for(let i = 0; i < person.closeProx.length; i++) {
-            //   if (!person.closeProx[i].tweenDone) {
-            //     person.closeProx[i].colorTween.start();
-            //   }
-            // }
-            // console.log('Done');
+              for (let i = 0; i < person.closeProx.length; i++) {
+                if (!person.closeProx[i].tweenDone) {
+                  person.closeProx[i].colorTween.start();
+                  // person.closeProx.splice(randomIndex, 1);
+
+                }
+              }
+            }
           });
 
         person.colorTween = colorTweenIn;
